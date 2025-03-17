@@ -8,10 +8,11 @@ public class BuildPlanner : MonoBehaviour
     [SerializeField] private Button _removeButotn;
     [SerializeField] private BuildingUIItem[] _buildingUIItems;
     [SerializeField] private PlayerInputController _inputController;
-    
+
     private Building _selectedBuildingWithButton = null;
-    private Building _selectedBuildingOnGround = null;
+    private Building _removingBuilding = null;
     private BuildingDragger _buildingDragger;
+    private bool _isRemoving = false;
 
     public event Action<Building> BuildingOrdering;
 
@@ -23,10 +24,10 @@ public class BuildPlanner : MonoBehaviour
             buildingItem.BuildingSelected += OnBuildingItemSelected;
 
         _inputController.ObjectSelectedOnGround += OnObjectSelectedOnGround;
-        _inputController.ObjectDeselectedOnGround += OnObjectDeselectedOnGround;
+        _inputController.MouseMoved += OnMouseMoved;
 
         _orderButton.onClick.AddListener(OrderBuilding);
-        _removeButotn.onClick.AddListener(RemoveBuilding);
+        _removeButotn.onClick.AddListener(() => _isRemoving = true);
     }
 
     public void OnDisable()
@@ -35,10 +36,10 @@ public class BuildPlanner : MonoBehaviour
             building.BuildingSelected -= OnBuildingItemSelected;
 
         _inputController.ObjectSelectedOnGround -= OnObjectSelectedOnGround;
-        _inputController.ObjectDeselectedOnGround -= OnObjectDeselectedOnGround;
+        _inputController.MouseMoved -= OnMouseMoved;
 
         _orderButton.onClick.RemoveListener(OrderBuilding);
-        _removeButotn.onClick.RemoveListener(RemoveBuilding);
+        _removeButotn.onClick.RemoveAllListeners();
     }
 
     public void Init(BuildingDragger buildingDragger)
@@ -46,30 +47,38 @@ public class BuildPlanner : MonoBehaviour
         _buildingDragger = buildingDragger;
     }
 
+    private void OnMouseMoved(Vector3 _, Ray ray)
+    {
+        if (_isRemoving && Physics.Raycast(ray, out RaycastHit hit, float.PositiveInfinity))
+        {
+            if (hit.collider.TryGetComponent(out Building building))
+            {
+                if (_removingBuilding != null)
+                    _removingBuilding.DisableOutline();
+
+                _removingBuilding = building;
+                building.EnableOutline();
+            }
+            else
+            {
+                if (_removingBuilding != null)
+                {
+                    _removingBuilding.DisableOutline();
+                    _removingBuilding = null;
+                }
+            }
+        }
+    }
+
     private void OnObjectSelectedOnGround(Collider @object)
     {
         if (_buildingDragger.IsDragging)
             return;
 
-        if (_selectedBuildingOnGround != null)
-            _selectedBuildingOnGround.Deselect();
-
-        if (@object.TryGetComponent(out Building building))
+        if (@object.TryGetComponent(out Building building) && _isRemoving)
         {
-            building.Select();
-            _selectedBuildingOnGround = building;
-        }
-    }
-
-    private void OnObjectDeselectedOnGround()
-    {
-        if (_buildingDragger.IsDragging)
-            return;
-
-        if (_selectedBuildingOnGround != null)
-        {
-            _selectedBuildingOnGround.Deselect();
-            _selectedBuildingOnGround = null;
+            BuildingRemoving?.Invoke(building);
+            _isRemoving = false;
         }
     }
 
@@ -82,11 +91,5 @@ public class BuildPlanner : MonoBehaviour
     {
         if (_selectedBuildingWithButton != null)
             BuildingOrdering?.Invoke(_selectedBuildingWithButton);
-    }
-
-    private void RemoveBuilding()
-    {
-        if (_selectedBuildingOnGround != null)
-            BuildingRemoving?.Invoke(_selectedBuildingOnGround);
     }
 }

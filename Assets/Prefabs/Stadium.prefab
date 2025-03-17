@@ -97,7 +97,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   outlineMode: 1
-  outlineColor: {r: 0, g: 0.050980393, b: 0.5764706, a: 1}
+  outlineColor: {r: 0.8490566, g: 0.3244037, b: 0.3403035, a: 1}
   outlineWidth: 10
   precomputeOutline: 0
   bakeKeys: []
@@ -198,9 +198,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5dc72e7ee4bffe047ac31bc0fdd5b3fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _outline: {fileID: 6648237119479673286}
   _buildingIndicator: {fileID: 3412504779514342523}
   _collider: {fileID: 13152827165940073}
+  _outline: {fileID: 6648237119479673286}
+  _gridIndex: 2
 --- !u!1001 &4308366941431966875
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 public class BuildingDragger : IActivatable
 {
@@ -42,7 +43,7 @@ public class BuildingDragger : IActivatable
         IsDragging = true;
     }
 
-    private void MoveBuilding(UnityEngine.Vector3 position)
+    private void MoveBuilding(UnityEngine.Vector3 position, Ray _)
     {
         if (_draggingBuilding != null)
             BuildingDragging?.Invoke(_draggingBuilding, position);

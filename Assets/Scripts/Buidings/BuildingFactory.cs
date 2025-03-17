@@ -7,6 +7,11 @@ public class BuildingFactory : MonoBehaviour
         return Instantiate(building);
     }
 
+    public Building CreateBuilding(Building building, Vector3 position)
+    {
+        return Instantiate(building, position, Quaternion.identity);
+    }
+
     public void DestroyBuilding(Building building)
     {
         Destroy(building.gameObject);

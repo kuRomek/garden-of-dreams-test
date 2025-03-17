@@ -13,13 +13,11 @@ public class PlayerInputController : MonoBehaviour
 
     public event Action<Vector2> CameraMoved;
 
-    public event Action<Vector3> MouseMoved;
+    public event Action<Vector3, Ray> MouseMoved;
 
     public event Action MouseClicked;
 
     public event Action<Collider> ObjectSelectedOnGround;
-
-    public event Action ObjectDeselectedOnGround;
 
     private void Awake()
     {
@@ -52,9 +50,7 @@ public class PlayerInputController : MonoBehaviour
 
         if (Physics.Raycast(ray, out RaycastHit hit, float.PositiveInfinity))
         {
-            if (hit.collider.TryGetComponent(out Ground _))
-                ObjectDeselectedOnGround?.Invoke();
-            else if (hit.collider.TryGetComponent(out BoxCollider collider))
+            if (hit.collider.TryGetComponent(out BoxCollider collider))
                 ObjectSelectedOnGround?.Invoke(collider);
         }
     }
@@ -68,7 +64,7 @@ public class PlayerInputController : MonoBehaviour
         if (Physics.Raycast(ray, out RaycastHit hit, float.PositiveInfinity, _groundLayer))
         {
             if (hit.collider.TryGetComponent(out Ground _))
-                MouseMoved?.Invoke(hit.point);
+                MouseMoved?.Invoke(hit.point, ray);
         }
 
         Vector2 cameraMovingVector = Vector2.zero;

@@ -3,12 +3,16 @@ using UnityEngine;
 
 public class Building : MonoBehaviour
 {
-    [SerializeField] private Outline _outline;
     [SerializeField] private BuildingIndicator _buildingIndicator;
     [SerializeField] private BoxCollider _collider;
+    [SerializeField] private Outline _outline;
+    [SerializeField] private byte _gridIndex;
 
     private List<Building> _overlappedBuidings = new List<Building>();
+    
     public bool IsAvailableToPlace => _overlappedBuidings.Count == 0;
+
+    public byte GridIndex => _gridIndex;
 
     private void Awake()
     {
@@ -45,12 +49,12 @@ public class Building : MonoBehaviour
         }
     }
 
-    public void Select()
+    public void EnableOutline()
     {
         _outline.enabled = true;
     }
 
-    public void Deselect()
+    public void DisableOutline()
     {
         _outline.enabled = false;
     }

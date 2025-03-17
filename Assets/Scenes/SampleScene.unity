@@ -419,7 +419,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 427680516}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ff89e15b857d4694b970210148c397c3, type: 3}
   m_Name: 
@@ -1939,6 +1939,7 @@ MonoBehaviour:
   _buildingFactory: {fileID: 1751283913}
   _inputController: {fileID: 427680519}
   _ground: {fileID: 1856653228}
+  _buildingContainer: {fileID: 11400000, guid: 2041ba49a6ad6624d963447311dacef6, type: 2}
 --- !u!4 &1593888300
 Transform:
   m_ObjectHideFlags: 0
@@ -1948,7 +1949,7 @@ Transform:
   m_GameObject: {fileID: 1593888298}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.8796382, y: 2.9283605, z: -3.523332}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
