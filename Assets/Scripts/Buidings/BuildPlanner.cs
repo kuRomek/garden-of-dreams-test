@@ -11,6 +11,7 @@ public class BuildPlanner : MonoBehaviour
     
     private Building _selectedBuildingWithButton = null;
     private Building _selectedBuildingOnGround = null;
+    private BuildingDragger _buildingDragger;
 
     public event Action<Building> BuildingOrdering;
 
@@ -18,11 +19,11 @@ public class BuildPlanner : MonoBehaviour
 
     public void OnEnable()
     {
-        foreach (BuildingUIItem building in _buildingUIItems)
-            building.BuildingSelected += OnBuildingSelected;
+        foreach (BuildingUIItem buildingItem in _buildingUIItems)
+            buildingItem.BuildingSelected += OnBuildingItemSelected;
 
-        _inputController.ObjectSelectedOnGround += OnObjectSelected;
-        _inputController.ObjectDeselectedOnGround += OnObjectDeselected;
+        _inputController.ObjectSelectedOnGround += OnObjectSelectedOnGround;
+        _inputController.ObjectDeselectedOnGround += OnObjectDeselectedOnGround;
 
         _orderButton.onClick.AddListener(OrderBuilding);
         _removeButotn.onClick.AddListener(RemoveBuilding);
@@ -31,17 +32,25 @@ public class BuildPlanner : MonoBehaviour
     public void OnDisable()
     {
         foreach (BuildingUIItem building in _buildingUIItems)
-            building.BuildingSelected -= OnBuildingSelected;
+            building.BuildingSelected -= OnBuildingItemSelected;
 
-        _inputController.ObjectSelectedOnGround -= OnObjectSelected;
-        _inputController.ObjectDeselectedOnGround -= OnObjectDeselected;
+        _inputController.ObjectSelectedOnGround -= OnObjectSelectedOnGround;
+        _inputController.ObjectDeselectedOnGround -= OnObjectDeselectedOnGround;
 
         _orderButton.onClick.RemoveListener(OrderBuilding);
         _removeButotn.onClick.RemoveListener(RemoveBuilding);
     }
 
-    private void OnObjectSelected(Collider @object)
+    public void Init(BuildingDragger buildingDragger)
     {
+        _buildingDragger = buildingDragger;
+    }
+
+    private void OnObjectSelectedOnGround(Collider @object)
+    {
+        if (_buildingDragger.IsDragging)
+            return;
+
         if (_selectedBuildingOnGround != null)
             _selectedBuildingOnGround.Deselect();
 
@@ -52,8 +61,11 @@ public class BuildPlanner : MonoBehaviour
         }
     }
 
-    private void OnObjectDeselected()
+    private void OnObjectDeselectedOnGround()
     {
+        if (_buildingDragger.IsDragging)
+            return;
+
         if (_selectedBuildingOnGround != null)
         {
             _selectedBuildingOnGround.Deselect();
@@ -61,7 +73,7 @@ public class BuildPlanner : MonoBehaviour
         }
     }
 
-    private void OnBuildingSelected(Building building)
+    private void OnBuildingItemSelected(Building building)
     {
         _selectedBuildingWithButton = building;
     }
