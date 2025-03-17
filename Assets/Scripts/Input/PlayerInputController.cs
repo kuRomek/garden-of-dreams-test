@@ -1,55 +1,90 @@
 using System;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
-namespace Input
+public class PlayerInputController : MonoBehaviour
 {
-    public class PlayerInputController : MonoBehaviour
+    [SerializeField] private Camera _camera;
+    [SerializeField] private LayerMask _groundLayer;
+
+    private PlayerInput _input;
+    private Vector2 _mousePosition;
+
+    public event Action<Vector2> CameraMoved;
+
+    public event Action<Vector3> MouseMoved;
+
+    public event Action MouseClicked;
+
+    public event Action<Collider> ObjectSelectedOnGround;
+
+    public event Action ObjectDeselectedOnGround;
+
+    private void Awake()
     {
-        [SerializeField] private Camera _camera;
+        _input = new PlayerInput();
+    }
 
-        private PlayerInput _input;
+    private void OnEnable()
+    {
+        _input.Enable();
 
-        public event Action<Vector2> CameraMoved;
+        _input.Player.MouseClicked.performed += OnMouseClicked;
+        _input.Player.MouseMoved.performed += OnMouseMoved;
+    }
 
-        private void Awake()
+    private void OnDisable()
+    {
+        _input.Disable();
+
+        _input.Player.MouseMoved.performed -= OnMouseMoved;
+    }
+
+    private void OnMouseClicked(InputAction.CallbackContext context)
+    {
+        if (EventSystem.current.IsPointerOverGameObject() == true)
+            return;
+
+        MouseClicked?.Invoke();
+
+        Ray ray = _camera.ScreenPointToRay(_mousePosition);
+
+        if (Physics.Raycast(ray, out RaycastHit hit, float.PositiveInfinity))
         {
-            _input = new PlayerInput();
+            if (hit.collider.TryGetComponent(out Ground _))
+                ObjectDeselectedOnGround?.Invoke();
+            else if (hit.collider.TryGetComponent(out BoxCollider collider))
+                ObjectSelectedOnGround?.Invoke(collider);
+        }
+    }
+
+    private void OnMouseMoved(InputAction.CallbackContext context)
+    {
+        _mousePosition = context.action.ReadValue<Vector2>();
+
+        Ray ray = _camera.ScreenPointToRay(_mousePosition);
+
+        if (Physics.Raycast(ray, out RaycastHit hit, float.PositiveInfinity, _groundLayer))
+        {
+            if (hit.collider.TryGetComponent(out Ground _))
+                MouseMoved?.Invoke(hit.point);
         }
 
-        private void OnEnable()
-        {
-            _input.Enable();
+        Vector2 cameraMovingVector = Vector2.zero;
 
-            _input.Player.MouseMoved.performed += OnMouseMoved;
-        }
+        if (_mousePosition.x <= 0)
+            cameraMovingVector += Vector2.left;
 
-        private void OnDisable()
-        {
-            _input.Disable();
+        if (_mousePosition.x >= _camera.pixelWidth)
+            cameraMovingVector += Vector2.right;
 
-            _input.Player.MouseMoved.performed -= OnMouseMoved;
-        }
+        if (_mousePosition.y <= 0)
+            cameraMovingVector += Vector2.down;
 
-        private void OnMouseMoved(InputAction.CallbackContext context)
-        {
-            Vector2 mousePosition = context.action.ReadValue<Vector2>();
+        if (_mousePosition.y >= _camera.pixelHeight)
+            cameraMovingVector += Vector2.up;
 
-            Vector2 cameraMovingVector = Vector2.zero;
-
-            if (mousePosition.x <= 0)
-                cameraMovingVector += Vector2.left;
-
-            if (mousePosition.x >= _camera.pixelWidth)
-                cameraMovingVector += Vector2.right;
-
-            if (mousePosition.y <= 0)
-                cameraMovingVector += Vector2.down;
-
-            if (mousePosition.y >= _camera.pixelHeight)
-                cameraMovingVector += Vector2.up;
-
-            CameraMoved?.Invoke(cameraMovingVector);
-        }
+        CameraMoved?.Invoke(cameraMovingVector);
     }
 }

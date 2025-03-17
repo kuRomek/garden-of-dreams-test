@@ -1,9 +1,10 @@
 {
-    "name": "Input",
+    "name": "Buildings",
     "rootNamespace": "",
     "references": [
-        "GUID:75469ad4d38634e559750d17036d5f7c",
-        "GUID:a3e99e06323f3c8458b67e0f2428bd10"
+        "GUID:4cbcfd4c9ec3a644cbeaf29ac3cb76a5",
+        "GUID:2a8582cda2a162249b8dbd30d0d544c5",
+        "GUID:755c9244eb788254586651126d1aa2a1"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
